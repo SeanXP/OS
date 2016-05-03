@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 {
     pid_t pid = 0; // 记录fork()返回的pid值，用于判断父/子进程。
 
-    printf("main process [PID:%d]\n", getpid());
+    printf("main [PID:%d]\n", getpid());
 
     pid = fork();
 
@@ -29,11 +29,11 @@ int main(int argc, char* argv[])
     }
     else if(pid == 0)   // child
     {
-        printf("child process [PID:%d]\n", getpid());
+        printf("child [PID:%d], parent [PID:%d]\n", getpid(), getppid());
     }
     else                // parent
     {
-        printf("parent process [PID:%d]\n", getpid());
+        printf("parent [PID:%d], child [PID:%d]\n", getpid(), pid);
         // wait chlid precess end
         pid = wait(0);
         printf("child process [PID:%d] end.\n", pid);
