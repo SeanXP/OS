@@ -5,23 +5,22 @@
   > Author:            < Sean Guo >
   > Mail:              < iseanxp+code@gmail.com >
   > Created Time:      < 2016/04/18 >
-  > Description:
+  > Description:        open()
  ****************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h>          // fopen(), fclose()
+#include <stdlib.h>         // exit()
 #include <fcntl.h>          //open()
 #include <unistd.h>         //close(), unlink()
 #include <sys/stat.h>
-#include <errno.h>
-// fopen(), fclose() - <stdio.h>
+#include <errno.h>          // errno
 
 #define FILENAME    "./my.dat"
 #define FILENAME2   "./newfile"
 
 int main(int argc, char* argv[])
 {
-     /*
+     /*{{{
         int open(const char *path, int flags, ...);
         int open(const char *path, int flags, mode_t perms);
             path:   文件路径名
@@ -36,17 +35,20 @@ int main(int argc, char* argv[])
                     S_IRUSR | S_IWUSR | S_IXUSR
                     S_IRGRP | S_IWGRP | S_IXGRP
                     S_IROTH | S_IWOTH | S_IXOTH
-    */
+    }}}*/
     int fd;
 
     // read only a exist file.
+    printf("open file: %s\n", FILENAME);
     if((fd = open(FILENAME, O_RDONLY)) < 0)
     {
         perror("open failed");
         exit(EXIT_FAILURE);
     }
+    printf("close file: %s\n", FILENAME);
     close(fd);
 
+    printf("creat new file: %s\n", FILENAME2);
     // create a new file.
     // perms: rw-r--r--, 644;
     if((fd = open(FILENAME2, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
@@ -54,10 +56,14 @@ int main(int argc, char* argv[])
         perror("create failed");
         exit(EXIT_FAILURE);
     }
+    printf("close file: %s\n", FILENAME2);
     close(fd);
 
+    printf("press [enter] to continue...\n");
+    getchar();
+    printf("clear file: %s\n", FILENAME2);
     // clear file, O_TRUNC;
-    // #define cleat(path, perms) open(path, O_WRONLY | O_CREAT | O_TRUNC, perms)
+    // #define clear(path, perms) open(path, O_WRONLY | O_CREAT | O_TRUNC, perms)
     if((fd = open(FILENAME2, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
     {
         perror("clear file failed");
@@ -65,6 +71,7 @@ int main(int argc, char* argv[])
     }
     close(fd);
 
+    printf("unlink file: %s\n", FILENAME2);
     /*
        int unlink(const char *path);
        Return 0 on success or -1 on error (sets errno)
@@ -89,7 +96,7 @@ int main(int argc, char* argv[])
         perror("mkstemp file failed");
         exit(EXIT_FAILURE);
     }
-    printf("temp file: %s\n", pathname);
+    printf("temp file: %s, now unlink it.\n", pathname);
     if(unlink(pathname) == -1)
     {
         perror("unlink file failed");
