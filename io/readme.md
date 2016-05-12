@@ -61,4 +61,23 @@ read()不会自动在接受到的字符串后加`\0`，因为read()用于读取�
     buffer[ret] = '\0';
 
 ## write()
+
+    #include <unistd.h>
+
+    ssize_t write(int fd, void *buffer, size_t count);
+    // returns number of bytes written, or -1 on error
+
+返回实际写入文件的字节数，返回值可能小于`count`，这种情况称为`部分写`，对于磁盘文件，造成“部分写”的原因：
+
+* 磁盘已满，无法写完`count`个字节；
+* 进程资源对文件大小的限制，`RLIMIT_FSIZE`；
+
 ## close()
+
+    #include <unistd.h>
+    int close(int fd);
+
+显式关闭不再需要的文件描述符是良好的编程习惯。
+
+企图关闭一个未打开的文件描述符，或两次关闭同一个描述符，返回-1并设置error；
+
