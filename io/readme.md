@@ -37,5 +37,28 @@ Upon successful completion, these functions shall open the file and return a non
 Otherwise, these functions shall return −1 and set errno to indicate the error. If −1 is returned, no files shall be created or modified.
 
 ## read()
+
+    #include <unistd.h>
+
+    ssize_t read(int fd, void *buffer, size_t count);
+    // returns number of bytes read, 0 on EOF, or -1 on error
+
+系统调用不会分配内存缓存区，因此需要预先分配足够大小的缓冲区并传递指针给系统调用read()；
+
+* 如果read()从stdin读取，则遇到换行符`\n`，read()调用就结束。
+* 如果read()从文件读取，则遇到换行符`\n`不会结束。
+
+read()不会自动在接受到的字符串后加`\0`，因为read()用于读取多类设备，多类格式（二进制、文本），所以无法遵从C语言对字符串处理的约定。
+
+**因此在C语言中调用read()需要显式追加`\0`，同时要保证缓冲区大小**：
+
+    char buffer[MAX + 1];
+    if((ret = read(STDIN_FILENO, buffer, MAX)) < 0)
+    {
+        perror("read() error");
+        exit(EXIT_FAILURE);
+    }
+    buffer[ret] = '\0';
+
 ## write()
 ## close()
