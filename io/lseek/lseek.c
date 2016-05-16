@@ -16,6 +16,7 @@
 #include <fcntl.h>
 
 #define BUFFER_MAX_LEN  1024
+#define HOLE_OFFSET     1000000
 #define FILE_NAME1      "./hello.txt"
 #define FILE_NAME2      "./test.txt"
 
@@ -65,14 +66,14 @@ int main(int argc, char* argv[])
     //}}}
     close(fd);
 
-    printf("create new file and lseek to 1000 and write something.\n");
+    printf("create new file and lseek to %d and write something.\n", HOLE_OFFSET);
     printf("write to file: %s\n", FILE_NAME2);
     if((fd = open(FILE_NAME2, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
     {
         perror("open() failed");
         exit(EXIT_FAILURE);
     }
-    lseek(fd, 1000, SEEK_SET);
+    lseek(fd, HOLE_OFFSET, SEEK_SET);
     if((ret = write(fd, buffer, strlen(buffer))) < 0)
     {
         perror("read() error");

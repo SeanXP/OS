@@ -1,4 +1,4 @@
-OBJECT=lseek
+OBJECT=filehole
 CC=gcc
 FLAGS=
 
@@ -18,10 +18,7 @@ tag:
 test:
 	make
 	./$(OBJECT)
-	ls -l *.txt
-	du *.txt
-	od -c test.txt
 
 .PHONY : clean
 clean:
-	-rm $(OBJECT) test.txt
+	-rm $(OBJECT) *.txt
