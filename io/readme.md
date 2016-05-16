@@ -9,7 +9,10 @@
 | 1 | STDOUT_FILENO | stdout |
 | 2 | STDERR_FILENO | stderr |
 
-## open()
+* 标准输出是行缓冲的，在缓冲区被填满或遇到换行符号前不会输出。 对于stdout，`\n`意味着换行与清空缓冲区；
+* 标准错误是不缓冲的，所以语句执行完后立刻显示出来。 对于stderr，`\n`只意味换行；
+
+## open
 
     #include <sys/stat.h>
     #include <fcntl.h>
@@ -36,7 +39,7 @@ The open() function shall establish the connection between a file and a file des
 Upon successful completion, these functions shall open the file and return a non-negative integer representing the lowest numbered unused file descriptor.
 Otherwise, these functions shall return −1 and set errno to indicate the error. If −1 is returned, no files shall be created or modified.
 
-## read()
+## read
 
     #include <unistd.h>
 
@@ -60,7 +63,7 @@ read()不会自动在接受到的字符串后加`\0`，因为read()用于读取�
     }
     buffer[ret] = '\0';
 
-## write()
+## write
 
     #include <unistd.h>
 
@@ -72,7 +75,7 @@ read()不会自动在接受到的字符串后加`\0`，因为read()用于读取�
 * 磁盘已满，无法写完`count`个字节；
 * 进程资源对文件大小的限制，`RLIMIT_FSIZE`；
 
-## close()
+## close
 
     #include <unistd.h>
     int close(int fd);
@@ -81,3 +84,42 @@ read()不会自动在接受到的字符串后加`\0`，因为read()用于读取�
 
 企图关闭一个未打开的文件描述符，或两次关闭同一个描述符，返回-1并设置error；
 
+## lseek
+
+对于每个打开的文件，系统都会记录其文件偏移量。
+
+    #include <unistd.h>
+
+    off_t lseek(int fd, off_t offset, int whence);
+    // Returns new file offset if successful, or -1 on error
+
+* offset，偏移值，单位：字节；
+* whence，偏移参考基点：
+    * SEEK_SET，从文件头部起始点开始偏移offset字节。
+    * SEEK_CUR，从文件当前偏移量开始偏移offset字节。
+    * SEEK_END，从文件结尾开始偏移offset字节。
+
+示例：
+
+    lseek(fd, 0, SEEK_SET);         // start of file
+    lseek(fd, 0, SEEK_END);         // next by after the end of the file
+    lseek(fd, -1, SEEK_END);        // Last byte of file
+    lseek(fd, -10, SEEK_CUR);       // Ten bytes prior to current location
+    lseek(fd, 10000, SEEK_END);     // 10001 bytes past last byte of file
+
+**lseek()只是调整内核中与文件描述符相关的文件偏移量记录（一个变量），并没有引起对任何物理设备的访问。**
+
+**lseek()并不适用于所有类型的文件，不允许将lseek()用于pipe/FIFO/socket/tty，否则会调用失败并置errno为ESPIPE。**
+
+### 文件空洞
+文件偏移量跨越EOF，然后使用write()系统调用写入数据，则中间这段空间称为文件空洞。
+
+例如，新建文件，通过`lseek(fd, 1000, SEEK_SET)`，然后拷贝hello.txt的文件到新文件中：
+
+    ls -l *.txt
+    -rw-r--r-- 1 gxp staff   29 May 16 15:25 hello.txt
+    -rw-r--r-- 1 gxp staff 1029 May 16 15:38 test.txt
+
+* `vim`下可以看到`^@^@^@^@^@^@^@`，之后才是我们写入的ASCII数据。
+* `cat`自动跳过文件空洞，只显示正常的数据。
+* `od`下可以看到，前1000个字节都是`0x00`。
