@@ -1,0 +1,11 @@
+#Name Process Fan
+#nprocs 7
+#FD off
+#FD2 off
+#Parent on
+#noring
+for(i=1;i<nprocs;i++) {
+   childpid = fork();
+   if(childpid==0) break;
+}
+fprintf(stderr,"Process %d with parent %d\n",getpid(),getppid());

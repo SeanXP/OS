@@ -1,0 +1,34 @@
+initrd是“initial RAM disk”的简写，是一个启动时加载进内存的小型系统，
+initrd在内核2.5之前和2.5之后有些不一样，2.5之后的采用cpio格式，
+一般称为cpio-initrd，本文以2.5以后的版本为例，initrd并不是必须的，
+如果不想要initrd，就在编译内核时必须把所有模块都静态编译进内核中，
+这样内核会变得很大，更会引入一些不必要的模块，启动加载会很慢，
+如果不想内核变得十分臃肿，就要减少打入的模块，这就需要initrd发威了，
+initrd把内核的启动分成两个阶段，
+boot loader把内核和initrd加载到内存中，
+内核在加载真正的文件系统前会先访问内存中的initrd，
+然后把initrd中的内容释放到rootfs中，
+initrd解压后里面的目录就像一个小型系统，
+然后会执行initrd中的init脚本，
+init脚本主要是加载一些驱动模块，
+initrd执行完成后开始挂载真正的文件系统，这样系统就成功的启动了。
+
+1.解开initrd.img
+# zcat initrd.img-3.2.52 | cpio -i
+或
+# mv initrd.img-3.2.52 initrd.img-3.2.52.gz
+# gunzip initrd.img-3.2.52.gz
+# cpio -i < initrd.img-3.2.52
+
+2. 压缩
+# cd initrd.img-3.2.52
+# find ./ | cpio -c -o > initrd.img-3.2.52
+# gzip initrd.img-3.2.52
+# file initrd.img-3.2.52.gz
+# mv initrd.img-3.2.52.gz initrd.img-3.2.52
+
+
+  生成一个当前系统的initrd.img文件，在centos下有个工具叫mkinitrd，
+在debian下此工具改名为mkinitramfs
+
+  不同的内核默认的initrd.img里面的内容以及次级目录结构都有变化，但主要的一级目录没什么变化。

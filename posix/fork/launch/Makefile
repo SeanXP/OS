@@ -1,4 +1,4 @@
-OBJECT=hello
+OBJECT=launch hello
 CC=gcc
 FLAGS=
 
@@ -16,8 +16,7 @@ tag:
 
 .PHONY : test
 test:
-	make
-	./$(OBJECT)
+	./launch cmd.txt
 
 .PHONY : clean
 clean:

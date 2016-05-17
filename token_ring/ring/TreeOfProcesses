@@ -1,0 +1,11 @@
+#Name Process Tree
+#nprocs 5
+#npositions 16
+#FD off
+#FD2 off
+#Parent on
+#noring
+for(i=1;i<nprocs;i++) {
+   childpid = fork();
+}
+fprintf(stderr,"Process %d with parent %d\n",getpid(),getppid());

@@ -1,0 +1,10 @@
+1. 获取系统调用表地址
+sudo cat /proc/kallsyms | grep sys_call_table(没有权限则地址均为0000000...)
+或
+sudo cat /boot/System.map-3.5.0-44-generic | grep sys_call_table
+
+
+Shawn Guo 的系统调用表地址0xc15ee0a0. (2013/11/23 00:09 linux-3.5.0-44-generic, 多次启动均不改变)
+						  0xc1596020. (2013/11/24 13:34 linux-3.2.0)
+2. 在/usr/src/linux-source-3.2.0/arch/x86/include/asm/unistd_32.h中查找
+空闲的系统调用，找到223.

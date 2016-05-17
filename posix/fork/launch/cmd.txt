@@ -1,0 +1,5 @@
+uname -r
+date
+date
+date
+date

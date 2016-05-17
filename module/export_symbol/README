@@ -1,0 +1,9 @@
+学习EXPORT_SYMBOL宏的用法.
+
+编译一个mod1模块, 导出func1函数的信息,
+再编译一个mod2模块, 使用func1函数,
+
+Usage:
+#cd mod2
+#make test
+

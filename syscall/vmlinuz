@@ -1,0 +1,10 @@
+  vmlinuz是可引导的、压缩的内核。
+“vm”代表 “Virtual Memory”。Linux 支持虚拟内存。
+Linux能够使用硬盘空间作为虚拟内存，因此得名“vm”。
+vmlinuz是可执行的Linux内核，它位于/boot/vmlinuz，它一般是一个软链接，
+内核编译时通过命令make bzImage创建，
+然后通过：cp /usr/src/linux-2.4/arch/i386/linux/boot/bzImage 
+/boot/vmlinuz产生。
+bzImage是压缩的内核映像，需要注意，bzImage是用gzip压缩的，
+bzImage中的bz容易引起误解，bz表示“big zImage”。 
+bzImage中的b是“big”意思

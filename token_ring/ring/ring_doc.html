@@ -1,0 +1,1360 @@
+<HEAD>
+<TITLE>Using the UTSA Process Ring Simulator</TITLE>
+</HEAD>
+<BODY>
+<H1> Using the Process Ring Simulator</H1>
+
+This document was last modified on February 26, 2002 and reflects changes made
+in version 0.57.
+
+<p>
+
+<hr>
+<H1>Table of Contents</H1>
+
+<a href="#Overview">Overview</a><br>
+<a href="#Requirements">System and User Requirements</a><br>
+<a HREF="#Starting">Starting the Simulator</a><br>
+<a HREF="#Basic Operation">Basic Operation</a><br>
+<a HREF="#Simple Program Modifications">Simple Program Modifications</a><br>
+<a HREF="#Scheduling">Scheduling</a><br>
+<a HREF="#Displaying Information">Displaying Information</a><br>
+<a HREF="#Program Format">Program Format</a><br>
+<a HREF="#Changing The Program">Changing The Program</a><br>
+<a HREF="#Creating Programs">Creating Programs</a><br>
+<a HREF="#LocalLogging">Local Logging</a><br>
+<a HREF="#OtherButtons">Other Buttons</a><br>
+<a HREF="#Configuration">Configuration</a><br>
+<a HREF="#WidgetList">Widget List</a><br>
+<a HREF="#EnhancedProgramStructure">Enhanced Program Structure</a><br>
+<p>
+<hr>
+
+<p>
+<a name="Overview"></a>
+<h3>Overview</h3>
+
+The Process Ring Simulator simulates a program consisting of pipe, dup2, close,
+fork, read, write, and print instructions.  As originally written it was designed
+to follow the structures of the ring example of
+Chapter 7 of <em>UNIX Systems Programming,
+Concurrency, Communication, and Threads.</em>
+It has been significantly enhanced to allow other types of program structure.
+The first part of the document describes the use of the program as a
+process ring simulator.  The enhancement are described at the end of
+the document.
+<p>
+The simulator allows you to design a program and single step through it, 
+displaying pictorially the processes and pipes and their relationship.<p>
+The program can send data through the pipes and trace the operation of the 
+program.
+<p>
+The simulator is a Java program that uses the JELI package.  Many of the parts
+of the simulator use this standard interface.
+<p>
+
+<hr>
+<p>
+<a name="Requirements"></a>
+</p><h3>System and User Requirements</h3>
+<p>
+System requirements:
+</p><ul><li>
+    Computer with a Java runtime environment, version 1.1 or later.<br>
+    Java 1.4.2 or later is recommended.
+    </li><li>You need the following files to run the simulator:
+            <ul><li><tt>Ring.jar</tt>
+            <li><tt>Jeli.jar</tt>
+            <li><tt>ringconfig</tt>
+            <li><tt>ChainOfProcesses</tt>
+            <li><tt>FanOfProcesses</tt>
+            <li><tt>RingOfProcesses</tt>
+            <li><tt>TreeOfProcesses</tt>
+            <li><tt>runring.bat </tt>(for Windows) or <tt>runring</tt>
+                 for UNIX or Mac OSX
+        </ul>
+</ul>
+<p>
+User requirements:
+</p><ul><li>Familiarity with running a program in a command line environment
+    <li>Some knowledge of the <tt>fork</tt> and <tt>pipe</tt> functions
+</ul>
+
+<p>
+If you are only interested in this simulator, you can download a zip file
+<a href="http://vip.cs.utsa.edu/downloads/ring.zip">ring.zip</a>
+that contains all of the files that you need.
+<p>
+<b>Running in a non-Windows environment:</b><br>
+If you installed the simulator by copying the files from a CD, the
+scripts may not have the correct permissions to run.  The <tt>convert</tt>
+and <tt>runring</tt> files should be executable.<br>
+The ASCII files distributed with this distribution are in the Windows format
+in which lines end in a carriage return followed by a line feed. 
+It may be more convenient to have the carriage returns removed.
+If you are running under UNIX, Linux, or Mac OSX, it
+may be more convenient to have the carriage returns removed.
+You can remove all of the carriage returns from these files by executing the 
+<tt>convert</tt> script.
+<p>
+
+
+<hr>
+<a name="Starting"></a>
+<h3>Starting the Simulator</h3>
+If you are running from an image of the simulator CD, start in the
+<tt>ring</tt> subdirectory of the <tt>run</tt> directory.  If you unzipped
+the <b>Ring.zip</b> file in a single directory, start in that directory.
+In either case, you can start the simulator from a command window by
+executing typing <tt>runring</tt>.  In a Windows environment you can
+also just click on the file <tt>runring.bat</tt>.
+<p>
+If you do a custom installation, you can put the jar files anywhere you
+want.  Modify the <tt>runring.bat</tt> (Windows) or <tt>runring</tt>
+(Unix, Linux, Mac OSX) file so that the <tt>JARDIR1</tt> or <tt>JARDIR2</tt>
+variables points to the location of the jar files.
+<p>
+If the simulator does not start, make sure you have the Java runtime
+executables in your path.  In a command window, execute:<br>
+<tt>java -version</tt><br>
+and make sure this displays a version later than 1.0.
+<p>
+
+<hr>
+<a name="Basic Operation"></a>
+<h3>Basic Operation</h3>
+
+Start the simulator.
+If all goes well the simulator will start up and look something like 
+Figure 1.
+
+<p>
+<center>
+<IMG SRC="files/ring_simulator.gif" width=831 height = 571>
+<p><b> Figure 1: The main simulator window.</b>
+</center>
+<p>
+
+The figure shows one process with arrows representing standard input and 
+standard output.
+<p>
+
+Push the green <b>Run Until Done</b> button on the right side of the 
+window and the program will step through its execution.  After a few seconds
+the program will terminate and the screen will look like Figure 2.
+The rectangles represent pipes.
+
+<p>
+<center>
+<IMG SRC="files/ring_simulator_done.gif" width=831 height = 571>
+<p><b> Figure 2: The main simulator window.</b>
+</center>
+<p>
+This figure illustrates why this is called the Process Ring Simulator.
+The processes can communicate by sending messages in a ring,writing to standard
+output and reading from standard input.
+<p>
+To exit the simulator, push the pink <b>Quit</b> button that is in the upper
+right corner of the the yellow ring diagram.
+<p>
+To start the program from the beginning, find the <b>Reset</b> button in the
+second column of buttons under the diagram.
+<p>
+Figure 1 shows a diagram of the simulator window when the simulator first
+starts up, or after the <b>Reset</b> button has been pushed.  The large
+yellow area in the upper left part of the window is used for a diagram of the
+processes.
+<p>
+Each process is represented by a circle with its process ID in the center.
+The first process ID is always 100 and as processes are created by executing
+<b>fork</b> calls, the process IDs are incremented, assuming no other processes
+are created in the system.  Arrows out of the process represent file
+descriptors that can be used for output.  Arrows into the process represent
+file descriptors that can be used for input.  By default, standard error is
+not displayed since it clutters the diagram.
+<p>
+When a <b>pipe</b> call is executed, a rectangle representing the pipe is 
+displayed with two new file descriptors connected to the process. 
+A <b>dup2</b> call moves the file descriptor arrows appropriately and the
+<b>fork</b> call creates a new process.   When processes and pipes are 
+created, they are positioned so that when the standard program is run,
+the processes and pipes will appear in a ring.  The processes and pipes
+can be moved around on the screen by dragging them with the mouse.  The pipes
+can be rotated by dragging close to the corner of the pipe rectangle.  The
+numbers that represent the file descriptors can also be dragged.
+<p>
+To the right of the diagram is the program window.  This is a 
+<a href=../Jeli/widgets.html#TextDIsplay>
+Jeli Text Display</a>
+which shows the program being executed.  The arrow that starts out at the
+top is above the instruction to be executed next.  The process ID of the
+active process is shown in the <b>Execute: pid</b>
+button at the top of this window.
+Clicking on this button will cycle through the active processes.  Just below
+the program window are 5 labels showing the name of the program (if it has
+one, the default program being called <b>Ring of Processes</b>) and 
+the values of the local program variables.  These include the 
+integers <b>childpid</b> and <b>i</b>, the <b>fd</b> and <b>fd1</b> arrays
+and the contents of the buffer, <b>buf</b>.
+<p>
+Below the diagram and the program are 6 columns of buttons for controlling
+the simulation.
+<p>
+There are two basic ways of running the program.
+<p>
+The green <b>Run Until Done</b> button  on the rightmost column
+of buttons will start the program running and
+automatically step through the program at a given rate.  The rate can
+be modified using the light green slider labeled <b>Delay</b> that
+is located below the button.  The delay is in milliseconds and represent the 
+amount of time the simulator pauses after each step is displayed.
+The limiting factor on the speed of execution is the time it takes to
+redisplay after each step.  The slider
+is a standard
+<a href=../Jeli/widgets.html#Sliders>Jeli slider</a>.
+When the <b>Run Until Done</b> button is pushed, it changed to a 
+<b>Stop Running</b> button which can be used to stop the execution.
+In this mode of operation, the scheduling of the processes is controlled
+by the third column of buttons as described later.
+<p>
+The green <b>Execute</b> button executes one line of code.  
+This can be used to single-stop through the program.  After each instruction is
+executed, you may push the <b>Execute: pid</b> button at the top of the program
+to change which process will be executed next.
+
+<p>
+<hr>
+<a name="Simple Program Modifications"></a>
+<h3>Simple Program Modifications</h3>
+The second column of buttons can be used to make simple modifications to the
+program.  The <b>Onedirectional</b> button loads the standard default ring
+program.  The <b>Bidirectional</b> button loads a more complicated version that
+creates a bidirectional ring of processes.<p>
+The <b>Change Program</b> button uses a 
+<a href=../Jeli/widgets.html#PopupList>
+Jeli Popup List</a> to present a list of loadable programs.  The standard 
+programs normally distributed with the simulator include the ring, a 
+process fan, and a process chain.  Choosing one of these resets the program
+to the chosen one.  It is possible to have your own programs listed here.
+Each program listed corresponds to one line in the configuration file 
+<b>ringconfig</b>.  Adding lines to this file allows you to choose additional
+programs.  Programs can be created using a standard text editor or by
+the simulator.  Information
+on the format is in the section 
+<a href=./#CreatingPrograms>Creating Programs</a>.
+<p>
+The <b>break</b> button allows you to cycle through possibilities for
+breaking out of the main for loop of the program.  The table below gives the 
+relationship between the <b>Break</b> button and the code that is used:<p>
+<center>
+<table border=1>
+<tr><td>Button</td>
+    <td><b>Break: parent</b></td>
+    <td><b>Break: child</b></td>
+    <td><b>Break: parent and child</b></td>
+    <td><b>Break: none</b></td>
+</tr>
+<tr><td>Code</td>
+    <td><tt>if (childpid)<br>&nbsp&nbsp&nbsp break;</tt></td>
+    <td><tt>if (!childpid)<br>&nbsp&nbsp&nbsp break;</tt></td>
+    <td><tt>break;</tt></td>
+    <td>none</td>
+</tr>
+</table>
+</center>
+<p>
+The <b>Reset</b> button starts the program from the beginning again.
+<p>
+<hr>
+<a name="Scheduling"></a>
+<h3>Scheduling</h3>
+The simulator allows control over several aspects of the scheduling of the
+processes using the purple buttons in the third and fourth column.
+<p>
+The <b>After fork:</b> button controls which process executes after 
+a fork.  The possibilities are parent, child, either, and random.
+Either means that either the child or parent will execute and the choice is
+made randomly with equal probability.  Random means that any ready process
+can execute and the choice will be made among the ready processes with
+equal probability.
+<p>
+The <b>Choose Process</b> button controls which process will execute next
+when the running process loses the CPU.  A process can lose the CPU
+by having its quantum expire, by blocking on a wait for child call, 
+by blocking on a read from a pipe, or by terminating.  The choices are
+<b>FCFS</b> (the process that entered the ready queue first is chosen),
+<b>Next</b> (the ready process with the next highest PID is chosen) and 
+<b>Random</b>
+(a random ready process is chosen).
+The <b>Scheduling</b> button controls the process scheduling algorithm.
+The default is <b>no preempt</b> in which a process runs until it blocks
+or terminates.  When <b>RR</b> is chosen, round robin scheduling is used
+and a slider appears below the
+scheduling button allowing am integer quantum to be set.
+The quantum represents
+the number of instructions to be executed before the process loses the CPU.
+When <b>Random</b> is chosen, a slider appears below the scheduling button
+allowing a probability to be set.  This represents the probability that
+a process will lose the CPU after executing an instruction.
+<p>
+To the right of the <b>Scheduling</b> button is the <b>Print</b> button.
+The default is <b>Print Atomic</b> in which the output of <b>fprintf</b>
+is assumed to be atomic.  If <b>Print Not Atomic</b> is chosen, a 
+probability slider appears which gives the probability of losing the
+CPU after each character of the <b>fprintf</b> is output.
+<p>
+<hr>
+<a name="Displaying Information"></a>
+<h3>Displaying Information</h3>
+<p>
+There are several ways to display information about the state and history of
+the simulation.  Most of these are controlled by the <b>Display Info</b>
+button at the top of the 5th column of buttons.  Clicking on this brings up a
+<a href=../Jeli/widgets.html#PopupList>
+Jeli Popup List</a> to list some items that can be displayed.  Some of these
+items may be disabled if the corresponding information is not available.
+<p>
+The list of display options includes:
+<UL>
+<LI><b>Display Output</b> to show the output generated by the
+<b>fprintf</b> instructions.  Each process has a color associated with it
+and the output of each process is shown in the color of that process.
+The output can be displayed entirely in black by pushing the <b>Color</b>
+button at the bottom of this frame.  This changes the button to a
+<b>Black and White</b> button.  Pushing it again will change the display
+back to color.  The processes in the main diagram can also be displayed
+in color by pushing the pick <b>Black</b> button that is in the lower right
+corner of the diagram window.
+<LI><b>Display Process Info</b> shows information about all processes
+including the process ID, the original parent process ID
+(the ID of the process that created it), the actual parent
+process ID as reported by <b>getpid()</b>
+(that may be the ID of the init process)
+and the current process state.  The state will be one of:
+Running, Ready, Waiting for child, Read Blocked, Semaphore Blocked,
+Zombie, or Done.
+<LI><b>Display History</b> will display a list of all instructions executed.
+Each instruction is preceded by the process ID of the 
+process executing the instruction.
+<LI><b>Display Gantt Chart</b> displays a Gantt chart showing the state 
+history of each of the processes.
+<LI><b>Variables</b> displays the values of the variables for each process.
+<LI><b>Semaphores</b> displays each semaphore and either its value or the 
+      list of waiting processes.
+<LI><b>Frames</b> displays all of the frames created by the <b>Frame</b> button.
+<LI><b>Commentary</b> displays the commentary for the current programs if these
+is one.
+</UL>
+
+<p>
+You can show information about a particular process by clicking on the
+circle representing that process in the yellow display window.  This pops up
+two windows, one showing the history (instructions executed) of that process
+and one showing the current values of the variables for that process.
+
+<p>
+In addition, a frame containing information about a given pipe can
+be displayed by clicking on the pipe in the diagram.  Two Jeli Text Displays
+appear, the upper one containing the current contents of the pipe and the
+lower containing a history of everything that has been read from the pipe.
+<p>
+<hr>
+<a name="Program Format"></a>
+<h3>Program Format</h3>
+The simulator allows a fairly general program that creates a collection of
+processes and pipes.  The original version of the program was intended to
+simulator a process ring and has the format given below.  A more general format
+is described later.  The ring format is as follows:<p>
+&lt;instructions&gt;<br>
+<tt>for (i=1;i&lt;nprocs;i++) {</tt><br>
+&nbsp&nbsp&nbsp &lt;instructions&gt;<br>
+&nbsp&nbsp&nbsp <tt>if (childpid = fork()) {</tt><br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &lt;instructions&gt;<br>
+&nbsp&nbsp&nbsp <tt>}</tt><br>
+&nbsp&nbsp&nbsp <tt>else {</tt><br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &lt;instructions&gt;<br>
+&nbsp&nbsp&nbsp <tt>}</tt><br>
+&nbsp&nbsp&nbsp &lt;instructions&gt;<br>
+&nbsp&nbsp&nbsp &lt;optional conditional break instruction&gt;<br>
+<tt>}</tt><br>
+&lt;instructions&gt;<br>
+<p>
+The program assumes the following data:
+<pre>
+int i;
+int childpid;
+int fd[2];
+int fd1[2];
+char buf[BUFSIZE];
+</pre>
+where <tt>BUFSIZE</tt> is assumed to be large enough to handle anything
+generated by the program.  In addition, a constant called <b>nprocs</b> is
+used in the <b>for</b> loop.
+<p>
+A subset of the supported instructions that can be added on the fly from 
+inside the simulator is given below:
+<pre>
+pipe(fd);
+pipe(fd1);
+dup2(fd[0],0);
+dup2(fd[1],1);
+dup2(fd1[0],3);
+dup2(fd1[1],4);
+close(0);
+close(1);
+close(fd[0]);
+close(fd[1]);
+close(fd1[0]);
+close(fd1[1]);
+wait(null);
+fprintf(stderr,"This is Process %d with parent %d\n",getpid(),getppid());
+sprintf(buf,xxx);
+sprintf(buf+strlen(buf),xxx);
+fprintf(stderr,"%s",buf);
+write(1,buf,strlen(buf)+1);
+read(0,buf,BUFSIZE);
+read(0,buf+strlen(buf).BUFSIZE);
+</pre>
+The two <tt>sprintf</tt> instructions prompt for the entry of a format string
+that can contain up to 4 %d specifications.  For each of these the user is
+prompted to specify one of the values:
+<pre>
+i
+nprocs
+childpid
+getpid()
+getppid()
+</pre>
+Assumptions:
+<UL>
+<LI>The buffer, <tt>buf</tt> is of unlimited size and the
+    instructions guarantee that it will always contain a string.
+<LI>Pipes are of unlimited size and writes to a pipe are atomic.
+<LI>Reads from a pipe are atomic and a read will read everything in the pipe.
+<LI>A read from a pipe will block only if the pipe is empty and there are
+    processes that have the pipe open for writing.
+<LI>A write to a pipe will always write the full amount requested unless there
+    are no processes that can read from the pipe.  In this case a SIGPIPE
+    signal is simulated and the process terminates.
+<LI>The program does not check return values of system calls and so no error
+    checking is done.  If an error occurs such as a <tt>dup2</tt> with improper
+    argument or a write to a closed or never opened file descriptor, the 
+    operation is ignored.
+<LI>No operations are performed on standard error except with the 
+    <tt>fprintf</tt> instructions.  A write, close, or dup2 on standard error
+    will produce undetermined results.
+</UL>
+<p>
+<hr>
+<a name="Changing The Program"></a>
+<h3>Changing The Program</h3>
+The program can be modified from inside the simulator and saved for later use.
+<p>
+The first button in the third column is the <b>Mode</b> button.  It starts
+with <b>Mode: Execute</b> which allows for the running of the program.
+Clicking on this button changes it to <b>Mode: Program</b> and 6 new buttons 
+appear below it.  The first two buttons can be used to move the pointer
+up and down.  The pointer is shown as an arrow in the program window in the
+upper right part of the main display.  The next two buttons can be used to 
+add a new instruction to the program after the pointer or to delete the
+instruction after the pointer.
+<p>
+The <b>Add Instruction</b> pops up a menu listing the possible instructions
+to add.  The <b>Delete Instruction</b> button is active only when there is
+a valid instruction after the pointer.  Some instructions cannot be deleted
+such as the <tt>for</tt> loop, the <tt>if (childpid=fork())</tt> and the
+<tt>else</tt>.
+<p>
+The next button allows most instructions to be modified by conditionals such as
+<tt>if (i==1)</tt> or <tt>if (i!=1)</tt>.  These are most relevant
+after the for loop because at this point only the original parent has 
+i=1.
+<p>
+To run the modified program, click on the <b>Mode</b> button again to return to
+execute mode.
+<p>
+The current program can be saved using the yellow <b>Save Program</b> button
+in the first column of buttons.  This saves the program using the file name
+given in the button below.  You can change the name of the file to be used
+by clicking on this <b>Name:</b> button which is a 
+<a href="../Jeli/widgets.html#Value Buttons">
+Jeli Value Button</a>.
+<p>
+By adding a program line to the <b>ringconfig</b> file, these programs can
+be accessible to later runs of the simulator.
+<p>
+<hr>
+<a name="Creating Programs"></a>
+<h3>Creating Programs</h3>
+<p>This section describes the original ring interface.
+Information about the enhanced interface can be found 
+<a href=#EnhancedProgramStructure>here</a>.
+<p>
+A program file can be created using the simulator with the <b>Save Program</b>
+button discussed above.  The <b>ringconfig</b> file should contain a 
+program line for each file that can be chosen from the <b>Change Program</b> 
+menu.  These files can be created or modified using a standard text editor.
+When such a file is read into the simulator, it encodes each line of the
+file using an internal format representing the type of instruction represented
+by that line.  It is not necessary for each line to be a faithful representation
+of the corresponding instruction.  In fact, the simulator looks for key
+phrases in the instruction to determine which of the allowed instructions
+it is.
+<p>
+If you want to create a program using a text editor rather than from the
+simulator, the simulator may not interpret it exactly as you intend.
+It is best to start with a simulator-created program similar to the
+one you want and modify it.  Loading it into the simulator and saving it
+will put it into a correct format and tell you how the simulator 
+interpreted your input.  Look at the results and make sure that
+the program generated is the one you want.
+You can use the following information as a guideline for creating your program.
+
+<p>
+The format of a program file is as follows:<br>
+&lt;pseudocode lines each beginning with #&gt;<br>
+&lt;instructions&gt;<br>
+&lt;a for loop instruction&gt;<br>
+&lt;instructions&gt;<br>
+&lt;an if(childpid = fork) instruction&gt;<br>
+&lt;instructions&gt;<br>
+&lt;an end group instruction&gt;<br>
+&lt;an else instruction&gt;<br>
+&lt;instructions&gt;<br>
+&lt;an end group instruction&gt;<br>
+&lt;instructions&gt;<br>
+&lt;an optional break instruction&gt;<br>
+&lt;an end group instruction&gt;<br>
+&lt;instructions&gt;<br>
+<p>
+<UL>
+<LI>Any line starting with a # will be interpreted as a line of pseudocode.
+<LI>Lines beginning with <b>if (</b> or <b>if(</b> first have their
+    conditionals removed.  However, <b>if (childpid") == -1</b>,
+    <b>if (!childpid") == -1)</b> and instructions containing <b>fork</b>
+    are treated in a special manner.
+<LI>Any line containing <tt>=random(</tt> is interpreted as assigning
+    a variable to a random number.
+<LI>Any other line containing the name of a variable is a fork instruction
+    if the line also contains <tt>fork()</tt>, an assignment statement
+    if it contains <tt>=</tt>, and increment if it contains <tt>++</tt>
+    or a decrement if it contains <tt>--</tt>.  An assignment statement
+    can have either a variable or a numeric constant on the right side.
+<LI>Any line containing a <tt>wait(null)</tt> is a wait (for child) instruction.
+<LI>Any other line containing <tt>wait(</tt> is a semaphore wait instruction
+    and must have the name of a valid semaphore after the wait.
+<LI>Any line containing <tt>signal(</tt> followed by the name of a semaphore
+    is a semaphore signal instruction.
+<LI>Any line containing the string <tt>for</tt> and not containing the
+    string <tt>fork</tt> will be interpreted as a for loop instruction.
+<LI>Any line containing the string <tt>fork</tt> 
+    will be interpreted as the <b>if (childpid=fork) {</b> instruction.
+<LI>Any line containing a closed brace (}) will be interpreted as an end
+    group instruction.
+<LI>Any line containing <tt>else</tt> will be interpreted as the
+    <b>else {</b> instruction.
+<LI>Any line containing <tt>(childpid)</tt> will be interpreted as the
+    instruction: <b>if (childpid) {</b> instruction.
+<LI>Any line containing <tt>(!childpid)</tt> will be interpreted as the
+    instruction: <b>if (!childpid) {</b> instruction.
+<LI>An optional break instruction consists of one of the following:
+    <UL>
+    <LI> a line containing the string <tt>break</tt>
+    <LI> A line containing <tt>(childpid)</tt> followed by a line containing
+         the string <tt>break</tt> will be interpreted as<br>
+             <tt> if (childpid) break;</tt>
+    <LI> A line containing <tt>(!childpid)</tt> followed by a line containing
+         the string <tt>break</tt> will be interpreted as<br>
+             <tt> if (!childpid) break;</tt>
+    </UL>
+<LI> Any instruction line can start with either <tt>if(i==1)</tt>
+     or <tt>if(i!=1)</tt>.
+</UL>
+General instructions are interpreted as follows:
+<UL>
+<LI>A line containing <tt>sprintf(buf,"</tt> is interpreted as the
+    <b>sprintf(buf,"xxx",...)</b> instruction.
+<LI>A line containing <tt>sprintf(buf+strlen(buf),"</tt> is interpreted as the
+    <b>sprintf(buf+strlen(buf),"xxx",...)</b> instruction.
+<LI>If the <tt>"xxx"</tt> contains up to 4 <tt>%d</tt> substrings,
+    it should have the correct number of additional parameters.
+<LI>A line containing <tt>pipe</tt> will be interpreted as the 
+    <b>pipe(fd1[])</b> instruction if the line contains the character <tt>1</tt>
+    anywhere and <b>pipe(fd[])</b> otherwise.
+<LI>A line containing <tt>dup2</tt> fill be interpreted as a <b>dup2</b>
+    instruction.  The possibilities are:
+     <UL>
+     <LI> <b>dup2(n,m)</b> if no <tt>fd</tt> appears in the line.
+     <LI> <b>dup2(fd[n],m)</b> if <tt>fd[</tt> appears before the comma.
+     <LI> <b>dup2(m,fd[m])</b> if <tt>fd[</tt> appears after the comma.
+     <LI> <b>dup2(fd[n],m)</b> if <tt>fd1[</tt> appears before the comma.
+     <LI> <b>dup2(m,fd[m])</b> if <tt>fd1[</tt> appears after the comma.
+     <LI> <tt>n</tt> and <tt>m</tt> can be any integer values.
+     </UL>
+<LI>A line containing <tt>close(</tt> will be interpreted as:
+     <UL>
+     <LI> <b>close(n)</b> if no <tt>fd</tt> appears in the line
+     <LI> <b>close(fd[n])</b> if <tt>fd[</tt> appears in the line
+     <LI> <b>close(fd1[n])</b> if <tt>fd1[</tt> appears in the line
+     </UL>
+<LI>A line containing <tt>write(</tt> will be interpreted as
+     <UL>
+     <LI> <b>write(n,buf,strlen(buf)+1)</b> if no <tt>fd</tt> appears in 
+          the line
+     <LI> <b>write(fd[n],buf,strlen(buf)+1)</b> if <tt>fd[</tt> appears in 
+          the line
+     <LI> <b>write(fd1[n],buf,strlen(buf)+1)</b> if <tt>fd1[</tt> appears in 
+          the line
+      </UL>
+<LI>A line containing <tt>read(</tt> and not <tt>strlen</tt> will be interpreted as
+     <UL>
+     <LI> <b>read(n,buf,BUFSIZE)</b> if no <tt>fd</tt> appears in the line
+     <LI> <b>read(fd[n],buf,BUFSIZE)</b> if <tt>fd[</tt> appears in the line
+     <LI> <b>read(fd1[n],buf,BUFSIZE)</b> if <tt>fd1[</tt> appears in the line
+     </UL>
+<LI>A line containing <tt>read(</tt> and <tt>strlen</tt> will be interpreted as
+     <UL>
+     <LI> <b>read(n,buf+strlen(buf),BUFSIZE)</b> if no <tt>fd</tt> appears in the line
+     <LI> <b>read(fd[n],buf+strlen(buf),BUFSIZE)</b> if <tt>fd[</tt> appears in the line
+     <LI> <b>read(fd1[n],buf+strlen(buf),BUFSIZE)</b> if <tt>fd1[</tt> appears in the line
+     </UL>
+<LI>A lint containing <b>fprintf(stderr,</b> will be interpreted as print
+    to standard error and an attempt will be made to parse the rest of the
+    command into a format specification and a parameter list.
+<LI>Otherwise, a line containing <tt>print</tt> and <tt>buf</tt> will
+    be interpreted as <b>fprintf("%s",buf);</b>.
+</UL>
+The following pseudoinstructions are for creating variables:
+<UL>
+<LI><b>#int varname</b> defines an integer variable.
+<LI><b>#char varname</b> defines a character variable.
+<LI><b>#shared int varname val</b> defines a shared integer variable initialized to val..
+<LI><b>#shared char varname val</b> defines a shared character variable initialized to val.
+<LI><b>#semaphore varname n</b> defines a semaphore variable initialized to n.
+</UL>
+The following pseudoinstructions are supported and will change the corresponding
+simulator parameters:
+<UL>
+<LI><b>#FD2 on</b> turns on the display of FD 2.
+<LI><b>#FD2 off</b> turns off the display of FD 2.
+<LI><b>#FD on</b> turns on the display of file descriptor arrows.
+<LI><b>#FD off</b> turns off the display of file descriptor arrows.
+<LI><b>#parent on</b> turns on the display of arrow from parent to child.
+<LI><b>#parent off</b> turns off the display of arrow from parent to child.
+<LI><b>#name programname</b> sets the program name to <b>programname</b>.
+    This is displayed below the program code.
+<LI><b>#nprocs n</b> sets the variable <tt>nprocs</tt> in the program to the
+     given value.
+<LI><b>#npositions n</b> sets the positions of the processes and pipes int
+     the display so they they form a circle with n of each distributed evenly.
+<LI><b>#fork parent</b> after a fork, the parent continues executing.
+<LI><b>#fork child</b> after a fork, the child continues executing.
+<LI><b>#fork random</b> after a fork, a random process executes next.
+<LI><b>#scheduling FCFS</b> sets FCFS scheduling
+<LI><b>#scheduling RR n</b> sets round robin scheduling with quantum n.
+<LI><b>#scheduling random p</b> sets random scheduling with probability p.
+<LI><b>#info n</b> sets the number of lines for processes in the 
+      <b>Process Info</b> frame to n.
+<LI><b>#size small</b> set the display for small processes and pipes.
+<LI><b>#size large</b> set the display for large processes and pipes.
+<LI><b>#label variablename</b> sets the display to label each process by the
+       value of this variable rather than its process ID.
+<LI><b>#prompt s</b> where s is any string.  This will cause s to act as the 
+       system prompt and sent to standard error when the original process
+       terminates.
+<LI><b>#print atomic</b> set printing to be atomic.
+<LI><b>#print n</b> set printing to be not atomic with probability of losing the
+        CPU after each character printed to be n. 
+        The value of n must be between 0.0 and 1.0.
+<LI><b>#noring</b> Causes the program not to have the default ring structure.
+<LI><b>#com {</b> Start a commentary paragraph.  The paragraph starts on the
+next line and continues until there is a line containing only a <b>}</b>.
+Any number of commentary paragraphs can be entered with additional <b>#com</b>
+commands.
+<LI><b>#comparskip</b> Causes the commentary to skip lines between paragraphs.
+<LI><b>#comnoparskip</b> Causes the commentary to not skip lines between paragraphs.
+<LI><b>#comparindent n</b> Indent each commentary paragraph by n spaces.
+</UL>
+
+<p>
+<hr>
+<a name="LocalLogging"></a>
+<h3>Local Logging</h3>
+The simulator can display information in a log file.
+Log files are in HTML format and can be displayed
+by or printed from a standard browser.  The first column of light blue
+buttons controls the logging functions of the simulator.
+<p>
+Initially, these buttons are used to control the logging functions
+before the log file is open or after it is closed.
+The first button opens the log.  When the log file is 
+successfully opened most of the buttons change their function to control
+the log functions appropriate when logging is in progress.
+<p>
+While the log is closed, the second button toggles between the modes
+<b>Replace Old Log</b> and <b>Append to Log</b>.  In the former case,
+opening the log file overwrites any file with the same name that already
+exists.  In the latter case, the new log is appended to the old one.
+The third button can be used to change the name and directory used for storing
+the log file.  Pushing this button pops up a dialogue box in which the user
+can change the directory and log file names.  The names of the files for
+storing the graph image files created by the simulator can also be changed.
+<p>The <b>Show Remote Log</b> button can be used to pop up a browser window
+containing the log file generated when the log is stored remotely.
+<p>
+After the log is successfully opened, the <b>Open Log</b> button changes to
+<b>Close Log</b>, the second button changes to <b>Log Comment</b>, and the
+third button changes to <b>Stop Log</b>.
+<p>
+<b>Close Log</b> terminates logging and closes the log file.
+<b>Stop Log</b> temporarily stops adding information to the log file
+but keeps the log file open.  When pushed, this button changes to 
+<b>Start Log</b> which resumes the logging.
+<p>
+The <b>Log Comment</b> button pops up a window which allows the user to
+enter comments into the log file.
+<p>
+The <b>Log Image</b> button puts a copy of the currently displayed diagram
+in the log file.
+<p>
+Most of the frames that display history information have there own <b>Log</b>
+buttons which becomes active when the log is open and stores the information
+displayed in the log file.  The program window on the right side of the 
+main simulator window also has a <b>Log</b> button which can put a
+copy of the program in the log file.
+The Gantt charts can also be logged.
+
+<p>
+<hr>
+<a name="Configuration"></a>
+<h3>Configuration</h3>
+Configuration is controlled by default by the file <b>ringconfig</b>.
+The simulator can be started with an optional command line parameter
+giving the name of the configuration file.
+<p>
+The configuration file contains lines which can be used to set values for
+various simulator parameters.
+<p>
+The following configuration parameters are supported:
+<UL>
+<LI> <b>user username</b> sets the name displayed in the log file to <b>username</B>
+<LI> <b>size n</b> sets the size of the diagram to at least n by n pixels.
+<LI> <b>directory dirname</b> sets the directory for containing the log file to <b>dirname</b>
+<LI> <b>nprocs n</b> sets the value of the <tt>nprocs</tt> program variable to <b>n</b>.
+<LI> <b>rundelay n</b> sets the delay between  running steps to <b>n</b> milliseconds.
+<LI> <b>program filename</b> causes the simulator to read in the program with the given filename.  The name appears in the list under the <b>Change Program</b> menu.  There may be several of these lines in the configuration file.
+<LI> <b>infosize n</b> sets the initial number of lines for processes in the <b>Process Info</b> frame to <b>n</b>.
+<LI> <b>positions n</b> sets the number of positions for processes around the circle to be <b>n</b>.
+<LI> <b>small</b> sets the diagram to use small processes and pipes.
+<LI> <b>large</b> sets the diagram to use large processes and pipes.
+<LI> <b>showFD</b> true turns on the display of all file descriptor arrows.
+<LI> <b>showFD false</b> turns off the display of all file descriptor arrows.
+<LI> <b>showFD2 true</b> turns on the display of the standard error file descriptor arrow.
+<LI> <b>showFD2 false</b> turns off the display of the standard error file descriptor arrow.
+<LI> <b>parent-child true</b> turns on the display of the arrow from parent to child.
+<LI> <b>parent-child false</b> turns off the display of the arrow from parent to child.
+<LI> <b>nopreempt</b> sets the scheduling to non-preemptive.
+<LI> <b>quantum n</b> sets the scheduling so that a process loses the CPU after executing n instructions.
+<LI> <b>random p</b> sets the scheduling so that with probability p a process loses the CPU after executing an instruction.
+<LI> <b>FCFS</b> sets the scheduling so that the process chosen from the ready queue is the one that arrived first.
+<LI> <b>inorder</b> sets the scheduling so that the process chosen from the ready queue is the one with the next larger process ID after the current process.
+<LI> <b>outoforder</b> sets the scheduling so that a random process is chosen from the ready queue.
+<LI> <b>fork parent</b> allows the parent to continue executing after a fork.
+<LI> <b>fork child</b> causes the child process to execute after a fork.
+<LI> <b>fork either</b> causes either the parent or child process to execute with
+equal probability after a fork.
+<LI> <b>fork random</b> causes a random process from the ready queue to execute after a fork.
+<LI> <b>remoteport n</b> sets the port for remote logging to n.  This would not normally be used.
+<LI> <b>prompt pmt</b> sets the default prompt output when the original process
+<LI> <b>comfont n</b> sets the default size for the commentary font to n.
+<LI> <b>comrows n</b> sets the default number of rows for the commentary frame to n.
+<LI> <b>comcolumns n</b> sets the default number of columns for the commentary frame to n.
+
+</UL>
+
+<p>
+<hr>
+<a name="WidgetList"></a>
+<h3>Widget List</h3>
+<table border = 1>
+<tr><td>Widget</td>
+<td>Locations</td>
+<td>Description</td>
+</tr>
+
+<tr>
+<td>Main<br> Diagram</td>
+<td>Upper<br> left</br> corner</td>
+<td>This contains the main diagram of the processes and pipes.
+Each process is represented as a circle containing a number that is its 
+process ID.  The process can be moved by dragging it.  Clicking on the process
+brings up a Process History Frame giving a list of all instructions executed by
+this process.<br>
+Pipes are represented by rectangles.  They can be moved by dragging or rotated
+by dragging a point close to one of their corners.  Clicking on a pipe
+brings up a Pipe History Frame giving the current and past contents of the pipe.
+<br> New processes and pipes are put at a position around a circle so that
+under the default program they form a ring.  The number of positions around
+the circle can be set using the <b>npositions</b> button.  File descriptors
+are displayed as arrows from source to destination.  The standard error
+file descriptor is normally not displayed. The display of file descriptor arrows
+can be changed using the <b>Show FD</b> button.
+Processes are displayed as black circles by default.
+Pushing the <b>Black/Color</b> button located in the 
+lower right corner of the diagram can cause each process to be displayed
+in a unique color, the same color as used for output by that process as shown
+in the <b>Output Frame</b>. <br>
+Two sizes are available for the processes and pipes controlled by the 
+<b>size: large/small</b> button.  The large size allows about 6 processes
+and 6 pipes to fit around the standard size circle.  The small size allows
+about 20.  The size of the main diagram window can be changed by adjusting the
+size of the simulator frame.
+</td>
+</tr>
+
+<tr>
+<td>Quit<br> Button</td>
+<td>Upper<br> right</br> corner<br> of the<br>main<br>diagram</td>
+<td>Pushing this button exits the simulator.</td>
+</tr>
+
+<tr>
+<td>Black/<br>Color<br> Button</td>
+<td>Lower<br> right</br> corner<br> of the<br>main<br>diagram</td>
+<td>Pushing this button changes the color mode of the main diagram.
+When black, the processes and pipes are displayed in black.
+When color, each process is displayed in a distinctive color which is the
+same as the color of the output in the output frame.</td>
+</tr>
+
+<tr>
+<td>Frame<br> Button</td>
+<td>Upper<br> left</br> corner<br> of the<br>main<br>diagram</td>
+<td>Pushing this button changes pops up a frame containing the current image
+in the diagram.  This copy will not change when the main diagram changes.</td>
+</tr>
+
+<tr>
+<td>Program<br>Area</td>
+<td>Upper<br> right</br> corner</td>
+<td>This area contains five buttons across the top, an area of text showing the
+program, and 5 labels with information about the program on the bottom.<br>
+The end buttons at the top are labeled <b>&lt;</b> and <b>&gt;</b> and will decrease or increase the size of the font.  The <b>Clr</b> will temporarily clear
+the text displayed but the text will reappear.  The <b>Log</b> button will
+be active when the log is open and puts a copy of the program in the log file.
+<br>The center button is marked <b>Execute n</b> when the simulator is in
+execute mode.  The value of <b>n</b> is the process ID of the active process.
+Clicking on this button will make the next process active.  When in 
+program mode, this button is marked <b>Program</b>.
+
+</td>
+</tr>
+
+<tr>
+<td>Button<br>Area</td>
+<td>Below<br>the <br>main<br>diagram<br>and the<br>program<br>area</td>
+<td>This area has seven rows of 6 buttons. 
+The buttons are grouped by function with related buttons having the same
+light background color.
+<center>
+<table border = 1>
+<tr><td>Background Color</td><td>Function</td></tr>
+<tr><td>Light Blue</td><td>Logging</td></tr>
+<tr><td>Light Yellow</td><td>Saving the program</td></tr>
+<tr><td>Light Purple</td><td>Modifying the scheduling or<br>
+                             Modifying the program</td></tr>
+<tr><td>Light Magenta</td><td>Popping up information frames</td></tr>
+<tr><td>Green</td><td>Running the program</td></tr>
+<tr><td>Light Green</td><td>Adjusting the speed of program executing</td></tr>
+</table>
+</center>
+The individual buttons are described below.</td>
+</tr>
+
+<tr>
+<td>Information<br>Area</td>
+<td>Bottom<br>of the <br>main<br>window</td>
+<td>This label shows the current version number and acknowledges NSF for supporting the project.</td>
+</tr>
+
+<tr>
+<td>History<br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when the <b>Display History</b> option of the
+<b>Display Info</b> button in the 5th row 
+of buttons is pushed. 
+The frame shows all the instructions executed by all processes.  Each
+instruction is preceded by the process ID of the process that execute it.
+The buttons at the top of the frame can be used to change the size of the font,
+to clear the text and to log the text.
+</td>
+</tr>
+
+<tr>
+<td>Process <br>History<br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when you click on an individual process in the
+main diagram.  It shows all of the instructions executed by a given process.
+The buttons at the top of the frame can be used to change the size of the font,
+to clear the text and to log the text.
+</td>
+</tr>
+
+<tr>
+<td>Variables <br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when you click on an individual process in the
+main diagram.  It shows all of the variables for the process and the values of these variables.
+</td>
+</tr>
+
+<tr>
+<td>Pipe <br>History<br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when you click on an individual pipe in the
+main diagram.  The frame contains two text areas.  The upper one shows the 
+current contents of the pipe and the lower one shows the past contents.
+The buttons at the top of each text area can be used to change the size 
+of the font, to clear the text and to log the text.
+</td>
+</tr>
+
+<tr>
+<td>Output<br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when the <b>Display Output</b> option of the
+<b>Display Info</b> button in the 5th row of
+buttons is chosen.
+The frame displays the output (to standard error) generated by the program.
+The output from each process is in a distinct color by default.
+Pushing the <b>Color</b> button at the bottom of the frame will change it
+to <b>Black and White</b> and the output will appear only in black.
+</td>
+</tr>
+
+<tr>
+<td>Commentary<br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when the <b>Display Commentary</b> option of the 
+<b>Display Info</b> button in the 5th row of
+buttons is chosen.  The option is only available if a commentary
+has been defined for the current program.
+Commentary paragraphs are set with the #com pseudoinstruction.
+</td>
+</tr>
+
+<tr>
+<td>Process <br>Information<br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when you choose the <b>Display Process Info</b>
+option of the <b>Display Info</b>
+button in the 5th column of buttons.  It contains one line of information
+for each process giving its process ID, its original parent (the process that
+created it), it current parent (which may be init), and its process state:
+one of running, ready, read blocked n (blocked trying to read pipe n), 
+waiting for child, zombie, or done.  The number of initial lines
+for the processes is controlled by the <b>Info Size</b> button.
+</td>
+</tr>
+
+<tr>
+<td>Semaphore <br>Information<br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when you choose the <b>Display Semaphores</b> option
+of the <b>Display Info</b>
+button in the 5th column of buttons if the program has any semaphores
+defined.  It contains one line of information
+for each semaphore giving the name of the semaphore.  If there are no processes
+waiting for this semaphore to increase, the value of the semaphore is given.
+If there are processes waiting for this semaphore to increase, a list of PIDs
+of the waiting processes is given.
+</td>
+</tr>
+
+
+<tr>
+<td>Gantt <br>Chart<br>Popup</td>
+<td>Popup<br></td>
+<td>This frame appears when you choose the <b>Display Gantt Chart</b>
+option of the <b>Display Info</b>
+button in the 5th column of buttons.  The Gantt chart shows a graphical
+history of the states of each process.
+</td>
+</tr>
+</table>
+<p>
+<table border = 1>
+<tr><td colspan=4 align=center><b>Individual Buttons</b></td></tr>
+<tr><td>Button</td><td>row</td><td>col</td><td>Description</td></tr>
+<tr><td colspan=3 align=center>Logging Buttons</td><td>These 5 multiuse buttons
+have a light blue background and are located in the first column of buttons.
+The log file is in HTML format and can be displayed and printed from a 
+standard browser.
+</td></tr>
+<tr><td>Open Log</td><td>1</td><td>1</td><td>Open the log file.
+After the log is opened, the button changes to a <b>Close Log</b> button.
+</td></tr>
+<tr><td>Close Log</td><td>1</td><td>1</td><td>Close the log file.
+After the log is closed, the button changes to an <b>Open Log</b> button.
+</td></tr>
+<tr><td>Replace/Append Old Log</td><td>2</td><td>1</td><td>This button is
+available when the log file is not open.  It toggled between the two modes
+for opening a log file.  When in the replace mode, opening the log file
+will replace an older log file with the same name.  When in append mode,
+the new log information is appended to the old file.  This button changes to
+<b>Log Comment</b> when the log file is opened.
+</td></tr>
+<tr><td>Log Comment</td><td>2</td><td>1</td><td>Pop up a frame allowing you to 
+put a comment into the log file.  The frame contains two windows.  You can type
+into the bottom window to enter text to be placed into the log file.
+Pushing the <b>Log</b> button at the bottom of the frame enters the text
+into the log file.  The upper window displays all comments previously logged.
+This button is available only when the log file is open.  
+It changes to the <b>Replace/Append Old Log</b> button
+when the log file is closed.
+</td></tr>
+<tr><td>Change Log Filename</td><td>3</td><td>1</td><td>Pop up a window allowing
+the user to enter a name for the log file.  You can change the name of the log
+file, the directory for storing the log file, and the name used for storing
+images created, such as the diagram and Gantt chart.  Click on one of the
+entries to change it.  Push return when done editing the entry.  The mouse
+must be inside of the entry while it is being edited (the background
+becomes cyan).  When finished making the changes, push the red <b>Done</b>
+button.
+This button is available only when the log file is closed.  
+It changes to the <b>Stop/Start Log</b> button when the log file is opened.
+</td></tr>
+<tr><td>Stop/Start Log</td><td>3</td><td>1</td><td>This button toggle between
+two modes which allow automatic logging to occur.  This simulation does
+not support automatic logging, so this button should not be used.
+This button is available only when the log file is open.  
+It changes to the <b>Change Log Filename</b> button when the log file is opened.
+</td></tr>
+<tr><td>Show Remote Log</td><td>4</td><td>1</td><td>This button is only
+active when remote logging is used.  This is only the case when the simulator
+is run from a browser with the log file placed on a remote web site.
+</td></tr>
+<tr><td>Log Image</td><td>5</td><td>1</td><td>Put a copy of the main diagram
+into the log file.  This may take a while depending on the size of the
+diagram and the speed of the machine it is running on. 
+This button is only active when the log file is open. 
+</td></tr>
+
+<tr></tr>
+<tr><td colspan=3 align=center>Program Save Buttons</td><td>These 2 buttons
+have a light yellow background and are used for saving a copy of the current
+program on disk.  They are located in the first column of buttons.
+</td></tr>         
+<tr><td>Save Program</td><td>6</td><td>1</td><td>Save a copy of the 
+current program in a disk file.  The name of the file is set with the
+<b>Name:</b> button below it.  The program is saved in a readable format
+and can be loaded back into the program the next time it is run by placing
+a <b>program filename</b> line in the configuration file.
+</td></tr>
+<tr><td>Name: <i>filename</i></td><td>7</td><td>1</td>
+<td>Show and change the name of
+the file used for saving the current program.  To change the name, click
+on this button.  A cursor will appear at the end of the name.
+Keep the mouse pointer inside the button (the background
+becomes cyan) while changing the name.  Only the printing character keys and
+the backspace key can be used.  When done, push return and the cursor
+should disappear.  To abort, click on the button with the mouse.
+</td></tr>
+
+<tr></tr>
+<tr><td colspan=3 align=center>Miscellaneous Buttons</td><td>These 6 buttons
+in the second column generally relate to the program.
+</td></tr>         
+<tr><td>Onedirectional</td><td>1</td><td>2</td><td>Replace the current program
+with a standard one-directional ring program.  This program is always available
+independent of the contents of the configuration file.
+</td></tr>
+<tr><td>Bidirectional</td><td>2</td><td>2</td><td>Replace the current program
+with a two-directional ring program.  This button may be disabled in some 
+versions of the program.
+</td></tr>
+<tr><td>Change Program</td><td>3</td><td>2</td><td>This pops up a window
+giving giving a list of programs that have been loaded from disk files.
+Each entry corresponds to a <b>program filename</b> line in the configuration
+file.  At the bottom of the list are two additional choices.
+<b>Make Persistent</b> keeps the list active even after a choice is made.
+<b>Cancel</b> aborts changing the program.
+</td></tr>
+<tr><td>Break: <i>which</i></td><td>4</td><td>2</td>
+<td>Change the last lines in the for loop.  These lines determine which
+process breaks out of the loop.  The possibilities are:<br>
+break: parent (the parent breaks out using <tt>if (childpid) break;</tt><br>
+break: child (the child breaks out using <tt>if (!childpid) break;</tt><br>
+break: both (both parent and child break out of the loop using <tt>break;</tt><br>
+break: neither (neither parent nor child break out of the loop)<br>
+</td></tr>
+<tr><td>Reset</td><td>5</td><td>2</td><td>Reset the program so that it will
+start from the beginning.
+</td></tr>
+<tr><td>Refresh</td><td>1</td><td>4</td><td>Refresh the display of the diagram.
+This should automatically occur when necessary, so this button might never
+have to be used.
+</td></tr>
+<tr><td>Reset Positions</td><td>2</td><td>4</td><td>Reset the positions of
+the processes and pipes to their standard position for the ring of processes.
+It uses the current value of <b>nprocs</b> to place the processes and pipes
+in a circle.
+</td></tr>
+<tr><td>Reset Positions Center</td><td>3</td><td>4</td><td>
+This is identical to <b>Reset Positions</b> except that the first pipe
+created is put in the center of the display.
+</td></tr>
+</td></tr>
+<tr><td>Mode: Execute/Program</td><td>1</td><td>3</td><td>This button toggles between execute mode (in which the program can be run) and program mode (in which
+the program can be modified).
+A number of buttons in the third and fourth
+column change their function in these two modes.
+In execute mode the buttons control the
+process scheduling.  In program mode they allow modification of individual
+lines of the program.
+</td></tr>
+
+<tr><td colspan=3 align=center>Execute Mode Buttons</td><td>These buttons are
+active when the simulator is in execute mode.
+</td></tr>         
+<tr><td>After fork: <i>which</i></td><td>2</td><td>3</td><td>
+This button controls which process executes after a fork occurs.
+Pushing the button cycles through 4 possibilities.  The possibilities are:
+
+<table>
+<tr><td valign=top>parent:</td>
+<td>the parent continues executing after the fork.  
+The child is ready.</td></tr>
+<tr><td valign=top>child:</td>
+<td> the child executes after the fork and the parent is ready.</td></tr>
+<tr><td valign=top>either:</td>
+<td> one of the parent or child is chosen at random to execute and the 
+other is ready.</td></tr>
+<tr><td valign=top>random:</td>
+<td> both the parent and child become ready and a random ready process
+is chosen to execute.</td></tr>
+</table>
+</td></tr>
+
+<tr><td>Choose Process: <i>how</i></td><td>3</td><td>3</td><td>
+This button controls which process executes when the current process
+loses the CPU.
+Pushing the button cycles through 3 possibilities.  The possibilities are:
+ 
+<table>
+<tr><td valign=top>FCFS:</td>
+<td>the process that entered the ready queue first is chosen.</td></tr>
+<tr><td valign=top>Next:</td>
+<td> the process in the ready queue with the next highest process ID after the current process is chosen.</td></tr>
+<tr><td valign=top>Random:</td>
+<td> a random process is chosen from the ready queue.</td></tr>
+</table>
+</td></tr> 
+
+<tr><td>Scheduling: <i>which</i></td><td>4</td><td>3</td><td> 
+This button controls when a process loses the CPU.
+Pushing the button cycles through 3 possibilities.  The possibilities are: 
+nopreempt, RR, and random.  
+<br>RR refers to round robin scheduling and when this is
+chosen, an additional slider widget appears below this button.  The slider
+controls the quantum.
+Here the quantum refers to the number of instructions executed
+before the process is preempted from the CPU.  The slider widget consists
+of three parts.  The first part is three buttons controlling the values and range
+of the slider.  Next is a label giving the value of the quantum.  Finally there 
+is the slider for changing the quantum value.<br>
+Random scheduling refers to having the running process lose the CPU with a 
+given probability after executing an instruction.  When this is chosen a similar
+slider appears, this on controlling the probability.
+</td></tr>
+
+<tr><td>Print Atomic</td><td>4</td><td>4</td><td> 
+This button controls the atomic nature of the <tt>fprintf</tt>
+instruction.  When the mode is print atomic, this printing is done 
+atomicly so the process will not lose the CPU during printing.
+Pushing this button changes the mode to print not atomic.  A probability widget
+appears below that controls the probability that a process will lose the
+CPU after each character is output by the <tt>fprintf</tt> statement.
+</td></tr>
+
+<tr></tr>
+<tr><td colspan=3 align=center>Program Mode Buttons</td><td>These buttons are
+active when the simulator is in program mode.  In program mode the arrow in the
+program display points to the instruction below the arrow.
+</td></tr>         
+<tr><td>Pointer Up</td><td>2</td><td>3</td><td> 
+Move the pointer up one instruction.
+</td></tr>
+<tr><td>Pointer Down</td><td>3</td><td>3</td><td> 
+Move the pointer down one instruction.
+</td></tr>
+<tr><td>Add Instruction</td><td>4</td><td>3</td><td> 
+Bring up a menu of instructions that can be added below the arrow.
+Click on one of the instructions to add it.  For the <tt>sprintf</tt>
+instructions you will be prompted to enter a string.  This string may contain
+up to 4 %d format specifications.  For each one you will be prompted for
+a variable to print.
+</td></tr>
+<tr><td>Delete Instruction</td><td>5</td><td>3</td><td> 
+Delete the instruction below the pointer arrow.  This button will be
+active only if the instruction after the pointer can be deleted.
+</td></tr>
+<tr><td>Change if(...)</td><td>6</td><td>3</td><td> 
+Allows you to change the conditional on the given instruction, either by
+adding a conditional or removing one.
+</td></tr>
+</td></tr>
+<tr><td>New Variable</td><td>7</td><td>3</td><td> 
+Allows you to create a new integer variable.
+</td></tr>
+
+<tr></tr>
+<tr><td colspan=3 align=center>Diagram Modification Buttons</td><td>These buttons
+are located in the 3rd and 4th rows of the 5th column.
+They control the diagram display.
+</td></tr>         
+<tr><td>Show FD:</td><td>2</td><td>5</td><td> 
+This button cycles through three states:<br>
+not 2: Show file descriptor arrows except for standard error<br>
+all: Show all file descriptor arrows<br>
+none: Show no file descriptor arrows
+</td></tr>
+<tr><td>Show: Pipes and Procs<br>Show: All<br>Show: Parent-Child<br>Show: Processes only</td><td>3</td><td>5</td><td> 
+This button cycles through these four states.
+</td></tr>
+<tr><td>size:</td><td>6</td><td>5</td><td> 
+This button toggles between large and small.
+It controls the size of the circles and rectangles used for the
+processes and pipes. The small setting is appropriate when
+more than 6 processes are displayed.
+</td></tr>
+
+<tr></tr>
+<tr><td colspan=3 align=center>Execute Program Buttons</td><td>These buttons
+in the 6th column have a
+a green background and are used for running the program.
+</td></tr>         
+<tr><td>Run Until Done</td><td>1</td><td>6</td><td> 
+Start running the program and continue until there are no processes ready.
+When this button is pushed it is changed to a <b>Stop Running</b>
+button which stops the execution.
+</td></tr>
+<tr><td>Execute</td><td>2</td><td>6</td><td> 
+Execute one instruction of the program.
+</td></tr>
+<tr><td>Delay Slider</td><td>3-5</td><td>6</td><td> 
+Set the delay between executing one instruction to another.  The delay is
+measured in milliseconds.
+</td></tr>
+
+<tr></tr>
+<tr><td colspan=3 align=center>Miscellaneous Parameter Buttons</td><td>
+These buttons in the 6th column.
+</td></tr>         
+<tr><td>nprocs:</td><td>5</td><td>5</td><td> 
+Click on this button to change the value of the <tt>nprocs</tt> program
+variable.
+</td></tr>
+<tr><td>positions</td><td>6</td><td>5</td><td> 
+Click on this button to change the number of process positions around the circle
+containing the processes and pipes.
+</td></tr>
+<tr><td>info size</td><td>7</td><td>5</td><td> 
+Click on this button to change the initial number of process lines displayed
+int the Process Info frame.
+</td></tr>
+
+</table>
+
+<p>
+<hr>
+<a name="EnhancedProgramStructure"></a>
+<h3>Enhanced Program Structure</h3>
+This sections describes the enhanced program structure that is not restricted
+to the format of the process ring.  If a program contains the <b>#noring</b>
+pseudo instruction, then the ring program structure is not used and the program
+is just a sequence of instructions.
+<p>
+A number of additional instructions are available including nested <b>while</b>
+loops and conditionals.
+<p>
+Any number of integer or character variables can be declared with the
+<b>#int</b> and <b>#char</b> pseudo instructions.
+Currently there is no distinction made between integer and character variables.
+The following instructions can be used with variables.  Here, <b>var</b> and
+<b>var1</b> refer to the predefined variables (childpid, i) and any variable
+explicitly declared.  In addition, the constant nprocs can be used in places
+where it is not modified, as in the right side of an assignment or in a
+write statement.  Also, <b>const</b> refers to a numeric constant such as
+0 or 17.
+<p>
+Shared variables may be declared using<br> <b>#shared int varname val</b>
+or<br><b>#shared char varname val</b>.  The initial value, <b>val</b> is
+required for shared variables.
+<p>
+<UL>
+<LI>var = const;
+<LI>var = var1;
+<LI>var++;
+<LI>var--;
+<LI>read(0,&var,1);
+<LI>write(1,&var,1);
+<LI>var=random(x,y);
+<LI>var=fork();
+</UL>
+When <tt>var++</tt> or <tt>var--</tt> is used with a shared variable,
+it is expanded into three instructions, illustrating that this is not an
+atomic operation.  First the variable is moved into a register (local to
+the process), then the register is incremented or decremented, and finally
+the register is stored in the shared variable.  These operations are not
+safe unless protected, for instance by a semaphore.  The assignment of a 
+variable either from another variable or a constant is always treated as
+an atomic operation.
+<p>
+The read and write are meant to be only used for character variables.
+Only the low byte is written and the variable is set to the byte read.
+<p>
+The <b>var=random(x,y)</b> instruction sets the variable to a 
+random integer between x and y inclusive.  The x and y can be either variables
+or constants.
+<p>
+In addition, any variable can be written as a string into <b>buf</b> using the
+%d specification in an <tt.sprintf</tt> instruction.  At most 4 integers
+can be used in a single <tt>sprintf</tt>.
+<p>
+Counting semaphores are also supported.
+Each semaphore must be declared
+and initialized with a pseudo instruction before any program code.
+If <b>sem</b> is the name of such a semaphore then the instructions
+<b>wait(sem)</b> and <b>signal(sem)</b> are supported.
+<p>
+<b>Program Control</b>
+Any statement (except a while) can be preceded by an arbitrary number
+of conditionals in one of the following forms:
+<UL>
+<LI>if(var==x)
+<LI>if(var!=x)
+<LI>if(var&lt;x)
+<LI>if(var&lt;=x)
+<LI>if(var>x)
+<LI>if(var>=x)
+</UL>
+where <b>var</b> is the name of a variable and <b>x</b> is either the name 
+of a variable or a constant.
+<p>
+Blocks can be created by putting an open brace at the beginning of a line.
+These may be preceded by an arbitrary number of conditionals.  Blocks are
+closed by a closed brace on a line be itself.
+Any statement except a <b>while(1)</b>,
+including a block, can be preceded by any
+number of conditionals.
+<p>
+The only looping structure is <b>while(1)</b>, but since the following
+statement can be a conditional break, a <b>while(condition)</b> statement
+can be simulated.
+
+
+
+
+<p>
+</BODY>

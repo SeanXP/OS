@@ -1,0 +1,43 @@
+一。查看内核
+
+#dpkg --get-selections | grep linux-image
+
+命令结果如：
+
+linux-image-2.6.28-11-generic install
+
+linux-image-2.6.28-16-generic                    install
+
+linux-image-2.6.28-18-generic                    install
+
+linux-image-2.6.28-19-generic                    install
+
+linux-image-generic                              install
+
+二。查看现在使用的内核
+
+#uname -r
+
+命令结果如：
+
+2.6.28-19-generic
+
+ 
+
+三。把不再使用的内核用apt-get purge命令卸载掉。如前面的例子，则用：
+
+#sudo apt-get purge linux-image-2.6.28-11-generic
+
+在执行这条命令的时候，又出现错误：
+
+Errors were encountered while processing:
+
+ linux-restricted-modules-2.6.28-11-generic
+
+E: Sub-process /usr/bin/dpkg returned an error code (1)
+
+解决方法是执行命令：
+
+#dpkg --configure –a
+
+同样，卸载2.16 linux-image-2.6.28-16-generic

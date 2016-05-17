@@ -1,0 +1,14 @@
+主要根据<ubuntu添加系统调用的方法.pdf>
+
+1.update-initramfs -k 2.6.35.11 -c
+如果失败，观察是否提醒空间不足
+eg. gzip: stdout: No space left on device
+注意/boot空间大小，可以暂时将大文件mv至其他地方.
+df可以查看当前分区的大小, df -h
+
+2.printk函数调用为内核消息，一般不会显示在标准输出
+可以sudo dmesg查看内核消息日志.
+
+3.新增内核或删除内核时，sudo update-grub更新grub
+
+4.ubuntu内核编译，解决开机启动出现Could not load /lib/modules/.../modules.dep的问题 , 参照PDF

@@ -1,0 +1,23 @@
+#FD on
+#FD2 off
+#Parent off
+#Name Ring of Processes
+pipe(fd);
+dup2(fd[0],0);
+dup2(fd[1],1);
+close(fd[0]);
+close(fd[1]);
+for (i=1;i<nprocs;i++) {
+   pipe(fd);
+   if (childpid = fork()) {
+      dup2(fd[1],1);
+   }
+   else {
+      dup2(fd[0],0);
+   }
+   close(fd[0]);
+   close(fd[1]);
+   if (childpid)
+      break;
+}
+fprintf(stderr,"Process %d\n",getpid());

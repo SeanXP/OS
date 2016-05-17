@@ -1,0 +1,5 @@
+#!/bin/csh
+set JARDIR1 = "../jars"
+set JARDIR2 = "./"
+setenv CLASSPATH .:${JARDIR1}/Ring.jar:${JARDIR1}/Jeli.jar:${JARDIR2}/Ring.jar:${JARDIR2}/Jeli.jar
+java -mx64m RingDriver

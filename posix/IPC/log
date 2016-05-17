@@ -1,0 +1,48 @@
+Consumer is in buffer.
+Buffer is EMPTY. So consumer sleep...
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer wake up by Producer.
+Consumer fetch 1. Now Let's wake up the producer.
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer is in buffer.
+Consumer fetch 2. Now Let's wake up the producer.
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer is in buffer.
+Consumer fetch 3. Now Let's wake up the producer.
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer is in buffer.
+Consumer fetch 4. Now Let's wake up the producer.
+Consumer is in buffer.
+Buffer is EMPTY. So consumer sleep...
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer wake up by Producer.
+Consumer fetch 5. Now Let's wake up the producer.
+Consumer is in buffer.
+Buffer is EMPTY. So consumer sleep...
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer wake up by Producer.
+Consumer fetch 6. Now Let's wake up the producer.
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer is in buffer.
+Consumer fetch 7. Now Let's wake up the producer.
+Consumer is in buffer.
+Buffer is EMPTY. So consumer sleep...
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer wake up by Producer.
+Consumer fetch 8. Now Let's wake up the producer.
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer is in buffer.
+Consumer fetch 9. Now Let's wake up the producer.
+Producer is in buffer.
+Producer set the buffer. Now Let's wake up the consumer.
+Consumer is in buffer.
+Consumer fetch 10. Now Let's wake up the producer.
