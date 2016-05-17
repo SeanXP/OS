@@ -185,3 +185,33 @@ cp命令可以识别文件中是否含有文件空洞，并在拷贝过程中生
 7. 判断本次读取是否读到源文件的文件尾，如果是，则判断本次读取的是否是空洞，如果是空洞则在文件的最后写入""
 8. 重复1 ~ 7
 9. 关闭目标文件、源文件
+
+## 系统调用的原子性
+
+所有系统调用都是以原子操作方式执行的，这样内核保证了某系统调用中的所有步骤会作为独立操作而一次性加以执行，期间不会为其他进程或线程所中断。
+
+open()调用时，`O_CREAT | O_EXCL`保证当打开的文件已存在时返回一个错误，这样可以保证进程是打开文件的创建者。对文件检查是否存在和创建文件属于同一原子操作，如果先调用open()检查是否存在，再调用open()创建新文件，这样的非原子操作可能会导致多个相同进程都以为自己是文件的创建者。
+
+## fcntl - file control
+
+    #include <fcntl.h>
+    int fcntl(int fd, int cmd, ...);
+    Return on success depends on cmd, or -1 on error;
+
+fcntl()执行描述符控制操作;
+
+cmd:
+
+* `F_DUPFD`, 复制现有的描述符;
+* `F_GETFD` / `F_SETFD`, 获得/设置描述符标记;
+* `F_GETFL` / `F_SETFL`, 获得/设置描述符状态;
+* `F_GETOWN` / `F_SETOW`,获得/设置异步I/O所有权;
+* `F_GETLK` / `F_SETLN`, 获得/设置记录锁.
+
+常用用法:
+
+* 非阻塞式I/O:  	`fcntl(fd, F_SETFL, O_NONBLOCK);`
+* 信号驱动I/O:	`fcntl(fd, F_SETFL, O_ASYNC);`
+* 设置套接字属主: `fcntl(fd, F_SETOWN, pid);`, 指定用于接收SIGIN & SIGURG信号的套接字属主,
+进程组id通过提供负值的arg来说明(arg绝对值的一个进程组ID)，否则arg将被认为是进程id;
+* 获取套接字属主: `fcntl(fd, F_GETOWN);`, 获取套接字的当前属主, 返回值为PID;
