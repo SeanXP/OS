@@ -250,4 +250,33 @@ dup2()会为oldfd所指定的文件描述符创建副本，编号由newfd指定�
 	
 	int dup3(int oldfd, int newfd, int flags);
 	Return (new) file descriptor on success, or -1 on error;
-	
+
+## pread() & pwrite()
+
+    #include <sys/types.h>
+    #include <unistd.h>
+
+    ssize_t read(int fildes, void *buf, size_t nbyte);
+    ssize_t pread(int fildes, void *buf, size_t nbyte, off_t offset);
+    Return number of bytes read, 0 on EOF, or -1 on error.
+
+    ssize_t write(int fildes, const void *buf, size_t nbyte);
+    ssize_t pwrite(int fildes, const void *buf, size_t nbyte, off_t offset);
+    Return number of bytes written, or -1 on error.
+
+
+pread() & pwrite()类似read() & write()，区别：
+
+* 需要指定偏移量`offset`；从指定偏移量开始读写，而非文件的当前偏移量；
+* 不会改变文件的当前偏移量；
+
+
+pread()调用等价与下面的调用的同一原子操作：
+
+	off_t orig;
+	orig = lseek(fd, 0, SEEK_CUR);	// save current offset
+	lseek(fd, offset, SEEK_SET);
+	s = read(fd, buf, len);
+	lseek(fd, orig, SEEK_SET);		// Restore original file offset
+
+**多线程使用pread()或pwrite()实现对同一文件执行I/O操作**，如果试图使用lseek()和read()，就会引发竞争状态。
