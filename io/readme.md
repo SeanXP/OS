@@ -210,46 +210,46 @@ cmd:
 
 常用用法:
 
-* 非阻塞式I/O:  	`fcntl(fd, F_SETFL, O_NONBLOCK);`
-* 信号驱动I/O:	`fcntl(fd, F_SETFL, O_ASYNC);`
+* 非阻塞式I/O:      `fcntl(fd, F_SETFL, O_NONBLOCK);`
+* 信号驱动I/O:    `fcntl(fd, F_SETFL, O_ASYNC);`
 * 设置套接字属主: `fcntl(fd, F_SETOWN, pid);`, 指定用于接收SIGIN & SIGURG信号的套接字属主,
 进程组id通过提供负值的arg来说明(arg绝对值的一个进程组ID)，否则arg将被认为是进程id;
 * 获取套接字属主: `fcntl(fd, F_GETOWN);`, 获取套接字的当前属主, 返回值为PID;
 
 ## dup, 复制文件描述符
 
-	#include <unistd.h>
-	int dup(int oldfd);
-	Return (new) file descriptor on success, or -1 on error;
-	
+    #include <unistd.h>
+    int dup(int oldfd);
+    Return (new) file descriptor on success, or -1 on error;
+
 dup()复制一个打开的文件描述符oldfd, 并返回一个新描述符，两者都指向同一个打开的文件句柄。系统保证新描述符一定是编号值最低的未用文件描述符。
 
 如要实现`$ ls 2>&1`的功能，即将文件描述符1复制给文件描述符2，让两者指向相同的文件句柄(stdin)：
 
-	close(2);
-	newfd = dup(1);
+    close(2);
+    newfd = dup(1);
 
 上面的代码只有当文件描述符0已打开，newfd 才为2；为了明确指定新描述符的编号，建议使用`dup2(1,2);`;
 
 dup2()会为oldfd所指定的文件描述符创建副本，编号由newfd指定。如果newfd之前已打开，则dup2()会先将其关闭，然后再复制。
 
-	#include <unistd.h>
-	int dup2(int oldfd, int newfd);
-	Return (new) file descriptor on success, or -1 on error;
-	
+    #include <unistd.h>
+    int dup2(int oldfd, int newfd);
+    Return (new) file descriptor on success, or -1 on error;
+
 如果oldfd为无效的文件描述符，则error置EBADF，且不关闭newfd;
 
-	newfd = fcntl(oldfd, F_DUPFD, startfd);
-	
-为oldfd创建一个副本，且将使用大于等于startfd的最小未用值作为新描述符；
+    newfd = fcntl(oldfd, F_DUPFD, startfd);
+
+ldfd创建一个副本，且将使用大于等于startfd的最小未用值作为新描述符；
 
 **文件描述符的正、副本之间共享同一打开的文件句柄所含的文件偏移量和状态标志，但是新文件描述符也有一套自己的文件描述符标志，且其close-on-exec标志（FD_CLOEXEC）总是处于关闭状态。**
 
-	#define _GUN_SOURCE
-	#include <unistd.h>
-	
-	int dup3(int oldfd, int newfd, int flags);
-	Return (new) file descriptor on success, or -1 on error;
+    #define _GUN_SOURCE
+    #include <unistd.h>
+
+    int dup3(int oldfd, int newfd, int flags);
+    Return (new) file descriptor on success, or -1 on error;
 
 ## pread() & pwrite()
 
@@ -273,10 +273,46 @@ pread() & pwrite()类似read() & write()，区别：
 
 pread()调用等价与下面的调用的同一原子操作：
 
-	off_t orig;
-	orig = lseek(fd, 0, SEEK_CUR);	// save current offset
-	lseek(fd, offset, SEEK_SET);
-	s = read(fd, buf, len);
-	lseek(fd, orig, SEEK_SET);		// Restore original file offset
+    off_t orig;
+    orig = lseek(fd, 0, SEEK_CUR);    // save current offset
+    lseek(fd, offset, SEEK_SET);
+    s = read(fd, buf, len);
+    lseek(fd, orig, SEEK_SET);        // Restore original file offset
 
 **多线程使用pread()或pwrite()实现对同一文件执行I/O操作**，如果试图使用lseek()和read()，就会引发竞争状态。
+
+## readv() - 分散输入
+
+    #include <sys/uio.h>
+    ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+    Return number of bytes read, 0 on EOF, or -1 on error.
+
+    struct iovec {
+        char   *iov_base;  /* Base address. */
+        size_t iov_len;    /* Length. */
+    };
+
+readv()实现分散输入的功能：从文件描述符 fd 所指代的文件中读取一片连续的字节，然后将其散置（scatters the input data into the iovcnt buffers）于 iov 指定的缓冲区。
+
+**原子性是readv()的重要属性，从调用进程的角度，内核一次性地完成了读取文件到缓冲区的数据转移。**即使有另外的进程共享同一文件偏移量，也不会影响readv()的调用。
+
+## writev() - 集中输出
+
+    #include <sys/uio.h>
+    ssize_t writev(int fildes, const struct iovec *iov, int iovcnt);
+wrtiev()实现集中输出功能：将 iov 所指定的缓冲区的数据拼接起来，以连续的字节序列写入文件描述符 fd 所指代的文件中。
+
+**writev()可以将不同类型的数据集中保存到文件，再有readv()读取出来，实现数据的持久化存储。**
+
+    int ival = 1234;
+    double dval = 0.1234;
+    char buffer[] = "hello world";
+
+    iov[0].iov_base = &ival;
+    iov[0].iov_len = sizeof(ival);
+    iov[1].iov_base = &dval;
+    iov[1].iov_len = sizeof(dval);
+    iov[2].iov_base = buffer;
+    iov[2].iov_len = sizeof(buffer);
+
+    ret = writev(fd, iov, 3);
