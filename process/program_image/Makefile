@@ -1,4 +1,4 @@
-OBJECT=getpid
+OBJECT=image1 image2
 CC=gcc
 FLAGS=
 
@@ -16,7 +16,9 @@ tag:
 
 .PHONY : test
 test:
-	./$(OBJECT)
+	make
+	ls -l $(OBJECT)
+	size $(OBJECT)
 
 .PHONY : clean
 clean:

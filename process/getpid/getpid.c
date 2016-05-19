@@ -5,7 +5,9 @@
   > Author:            < Sean Guo >
   > Mail:              < iseanxp+code@gmail.com >
   > Created Time:      < 2016/05/03 >
-  > Description:
+  > Description:       getpid, getppid -- get parent or calling process identification
+                          pid_t getpid(void);
+                          pid_t getppid(void);
  ****************************************************************/
 #include<stdio.h>
 #include<unistd.h>      // getpid(), getppid()...

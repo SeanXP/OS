@@ -45,3 +45,14 @@ make test:
     ls -l image1 image2
     -rwxr-xr-x 1 gxp staff 106688 May 19 09:25 image1
     -rwxr-xr-x 1 gxp staff   4288 May 19 09:25 image2
+
+size (Linux):
+
+    $ ls -l image1 image2
+    -rwxr-xr-x 1 gxp users 106656 May 19 10:14 image1
+    -rwxr-xr-x 1 gxp users   6640 May 19 10:14 image2
+
+    $ size image1 image2                                                                                                                                                  !427
+    text    data     bss     dec     hex filename
+    1099  100560       8  101667   18d23 image1
+    1099     544  100032  101675   18d2b image2
