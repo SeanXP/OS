@@ -1,4 +1,4 @@
-OBJECT=image1 image2
+OBJECT=close
 CC=gcc
 FLAGS=
 
@@ -17,7 +17,7 @@ tag:
 .PHONY : test
 test:
 	make
-	ls -l $(OBJECT)
+	./$(OBJECT)
 
 .PHONY : clean
 clean:
