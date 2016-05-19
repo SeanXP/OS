@@ -15,7 +15,7 @@ tag:
 	ctags -R .
 
 .PHONY : test
-test:
+test:$(OBJECT)
 	./$(OBJECT)
 
 .PHONY : clean

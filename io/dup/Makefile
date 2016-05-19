@@ -15,11 +15,9 @@ tag:
 	ctags -R .
 
 .PHONY : test
-test:
-	make
+test:$(OBJECT)
 	./dup
-test2:
-	make
+test2:$(OBJECT)
 	./dup2
 
 .PHONY : clean

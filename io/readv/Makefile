@@ -15,8 +15,7 @@ tag:
 	ctags -R .
 
 .PHONY : test
-test:
-	make
+test:$(OBJECT)
 	./writev
 	ls -l test.dat
 	cat test.dat
