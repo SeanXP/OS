@@ -1,4 +1,4 @@
-OBJECT=change_hostname
+OBJECT=uname
 CC=gcc
 FLAGS=
 
@@ -16,18 +16,8 @@ tag:
 
 .PHONY : test
 test: $(OBJECT)
-	make
-	sudo ./$(OBJECT) new_hostname_test
+	./$(OBJECT)
 	make clean
-	bash
-
-.PHONY : restore
-restore: $(OBJECT)
-	make
-	sudo ./$(OBJECT) Aspire-4750
-	make clean
-	bash
-
 
 .PHONY : clean
 clean:
