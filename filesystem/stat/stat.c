@@ -54,7 +54,13 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+// 决定filePermStr()是否输出SUID/SGID信息，设置参数flags为FP_SPECIAL则输出;
+#define FP_SPECIAL 1
+
 void print_stat(struct stat *statval);
+
+// 将文件权限掩码转换为字符串
+char * filePermStr(mode_t perm, int flags);
 
 int main(int argc, char* argv[])
 {
@@ -88,20 +94,21 @@ void print_stat(struct stat *statval)
             int mode = statval->st_mode;
             // 也可是使用宏定义，测试宏S_ISREG()
             if((mode & S_IFMT) == S_IFREG)
-                printf("regular file\n");
+                printf("regular file");
             if(S_ISDIR(mode))
-                printf("directory\n");
+                printf("directory");
             if(S_ISCHR(mode))
-                printf("char device\n");
+                printf("char device");
             if(S_ISBLK(mode))
-                printf("block device\n");
+                printf("block device");
             if(S_ISFIFO(mode))
-                printf("fifo/pipe file\n");
+                printf("fifo/pipe file");
             if(S_ISSOCK(mode))
-                printf("socket\n");
+                printf("socket");
             if(S_ISLNK(mode))
-                printf("link file\n");
+                printf("link file");
         }
+    printf("\t %s \n", filePermStr(statval->st_mode, FP_SPECIAL));
     printf("hard link number:   %d \n",     statval->st_nlink);
     printf("UID:                %d \n",     statval->st_uid);
     printf("GID:                %d \n",     statval->st_gid);
@@ -113,4 +120,24 @@ void print_stat(struct stat *statval)
     printf("block number:       %lld \n",   statval->st_blocks);
     printf("optimal I/O size:   %d \n",     statval->st_blksize);
 
+}
+
+// 将文件权限掩码转换为字符串
+char * filePermStr(mode_t perm, int flags)
+{
+#define PERM_STR_SIZE   sizeof("rwxrwxrwx")
+    static char str[PERM_STR_SIZE];
+    snprintf(str, PERM_STR_SIZE, "%c%c%c%c%c%c%c%c%c",
+            (perm & S_IRUSR) ? 'r':'-', (perm & S_IWUSR) ? 'w':'-',
+            (perm & S_IXUSR) ?
+                    (((perm & S_ISUID) && (flags & FP_SPECIAL)) ? 's':'x'): (((perm & S_ISUID) && (flags & FP_SPECIAL)) ? 'S':'-'),
+            (perm & S_IRGRP) ? 'r':'-', (perm & S_IWGRP) ? 'w':'-',
+            (perm & S_IXGRP) ?
+                    (((perm & S_ISGID) && (flags & FP_SPECIAL)) ? 's':'x'): (((perm & S_ISGID) && (flags & FP_SPECIAL)) ? 'S':'-'),
+            (perm & S_IROTH) ? 'r':'-', (perm & S_IWOTH) ? 'w':'-',
+            (perm & S_IXOTH) ?
+                    (((perm & S_ISVTX) && (flags & FP_SPECIAL)) ? 't':'x'): (((perm & S_ISVTX) && (flags & FP_SPECIAL)) ? 'T':'-')
+            );
+
+    return str;
 }
