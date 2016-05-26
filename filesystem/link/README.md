@@ -77,3 +77,22 @@ unlink()  deletes a name from the filesystem.
 it is closed.
 * If the name referred to a symbolic link, the link is removed.
 * If the name referred to a socket, FIFO, or device, the name for it is removed but processes which have the object open may continue to use it.
+
+## 创建软链接 - symlink
+symlink — make a symbolic link relative to directory file descriptor
+
+    #include <unistd.h>
+    int symlink(const char *path1, const char *path2);
+
+若路径名path2已存在，则调用失败返回-1并设置errno为EEXIST；
+
+## 读取符号链接文件 - readlink
+
+readlink - read value of a symbolic link
+
+    #include <unistd.h>
+    ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
+    Return number of bytes placed in buf on success, or -1 on error;
+将符号链接文件的内容读取到buf中。
+
+`read()`调用的参数如果是符号链接，则打开的是链接所指向的文件，而非链接文件本身。如果要打开链接文件本身，需要使用`readlink()`；

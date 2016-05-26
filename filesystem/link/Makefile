@@ -1,4 +1,4 @@
-OBJECT=link unlink
+OBJECT=link unlink symlink readlink
 CC=gcc
 FLAGS=
 
@@ -16,9 +16,12 @@ tag:
 
 .PHONY : test
 test: $(OBJECT)
-	./link ./Makefile ./akefile
+	./link ./Makefile ./1akefile
+	./symlink ./Makefile ./2akefile
 	ls -li *akefile
-	./unlink ./akefile
+	./readlink ./2akefile
+	./unlink ./1akefile
+	./unlink ./2akefile
 	ls -li *akefile
 	make clean
 

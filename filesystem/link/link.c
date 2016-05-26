@@ -5,7 +5,7 @@
   > Author:            < Sean Guo >
   > Mail:              < iseanxp+code@gmail.com >
   > Created Time:      < 2016/05/26 >
-  > Description:       文件硬链接以及符号链接函数联系
+  > Description:       文件硬链接
 
     link - make a new name for a file
 
